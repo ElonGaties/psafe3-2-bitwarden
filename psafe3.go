@@ -81,6 +81,9 @@ func VaultFromFile(inputFile string, password string) (*Vault, error) {
 	if err := vault.readRecords(); err != nil {
 		return nil, err
 	}
+	if err := vault.validateHMAC(); err != nil {
+		return nil, err
+	}
 
 	return &vault, nil
 }
@@ -229,6 +232,8 @@ func (v *Vault) readRecords() error {
 		if field.rawType == 0xff {
 			break
 		}
+
+		v.checker.Write(field.rawValue)
 	}
 
 	// Reading actual fields and creating records
@@ -250,6 +255,22 @@ func (v *Vault) readRecords() error {
 			v.checker.Write(field.rawValue)
 			cur_record.addRawField(*field)
 		}
+	}
+
+	return nil
+}
+
+func (v *Vault) validateHMAC() error {
+	vault_hmac := make([]byte, 32)
+	err := binary.Read(v.reader, binary.LittleEndian, vault_hmac)
+	if err != nil {
+		return err
+	}
+
+	data_hmac := v.checker.Sum(nil)
+
+	if string(vault_hmac) != string(data_hmac) {
+		return errors.New("psafe3: file integrity check failed")
 	}
 
 	return nil
