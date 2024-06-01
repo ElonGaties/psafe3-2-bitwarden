@@ -15,20 +15,18 @@ import (
 	"golang.org/x/crypto/twofish"
 )
 
-type Cipher struct {
-	Block1     [16]byte
-	Block2     [16]byte
-	Block3     [16]byte
-	Block4     [16]byte
-	InitialVec [16]byte
-}
-
 type Header struct {
 	Magic  [4]byte
 	Salt   [32]byte
 	Iter   uint32
 	Hash   [32]byte
-	Cipher Cipher
+	Cipher struct {
+		Block1     [16]byte
+		Block2     [16]byte
+		Block3     [16]byte
+		Block4     [16]byte
+		InitialVec [16]byte
+	}
 }
 
 type Vault struct {
