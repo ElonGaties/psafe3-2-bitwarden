@@ -38,17 +38,19 @@ type Vault struct {
 }
 
 type Record struct {
-	uuid         uuid.UUID
-	group        string
-	title        string
-	user         string
-	notes        string
-	password     string
-	lastModified time.Time
-	url          string
+	uuid            uuid.UUID
+	group           string
+	title           string
+	user            string
+	notes           string
+	password        string
+	lastModified    time.Time
+	url             string
+	email           string
+	protectedRecord byte
 }
 
-type Field struct {
+type RawField struct {
 	rawLength uint32
 	rawType   byte
 	rawValue  []byte
@@ -154,7 +156,7 @@ func (v *Vault) createDecrypterAndChecker(streched_key []byte) error {
 	return nil
 }
 
-func (r *Record) addRawField(rawField Field) error {
+func (r *Record) addRawField(rawField RawField) error {
 	switch rawField.rawType {
 	case 0x01:
 		id, err := uuid.FromBytes(rawField.rawValue)
@@ -176,12 +178,16 @@ func (r *Record) addRawField(rawField Field) error {
 		r.lastModified = time.Unix(int64(binary.LittleEndian.Uint32(rawField.rawValue)), 0)
 	case 0x0d:
 		r.url = string(rawField.rawValue)
+	case 0x14:
+		r.email = string(rawField.rawValue)
+	case 0x15:
+		r.protectedRecord = rawField.rawValue[0]
 	}
 
 	return nil
 }
 
-func (v *Vault) readField() (*Field, error) {
+func (v *Vault) readField() (*RawField, error) {
 	data := make([]byte, 16)
 	err := binary.Read(v.reader, binary.LittleEndian, data)
 	if err != nil {
@@ -212,7 +218,7 @@ func (v *Vault) readField() (*Field, error) {
 	}
 	raw_value = raw_value[:raw_len]
 
-	field := Field{rawLength: raw_len, rawType: raw_type, rawValue: raw_value}
+	field := RawField{rawLength: raw_len, rawType: raw_type, rawValue: raw_value}
 	return &field, nil
 }
 
