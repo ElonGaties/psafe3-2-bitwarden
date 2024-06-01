@@ -9,7 +9,7 @@ type Base struct {
 		Name string `json:"name"`
 	} `json:"folders"`
 	Items []struct {
-		PasswordHistory []struct {
+		PasswordHistory *[]struct {
 			LastUsedDate time.Time `json:"lastUsedDate"`
 			Password     string    `json:"password"`
 		} `json:"passwordHistory"`
@@ -34,7 +34,7 @@ type Base struct {
 			Password string  `json:"password"`
 			Totp     *string `json:"totp"`
 		} `json:"login,omitempty"`
-		CollectionIds *int `json:"collectionIds"`
+		CollectionIds *string `json:"collectionIds"`
 		Fields        *[]struct {
 			Name     string  `json:"name"`
 			Value    string  `json:"value"`
