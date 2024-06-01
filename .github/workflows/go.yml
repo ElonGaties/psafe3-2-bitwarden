@@ -24,5 +24,5 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: psafe3-2-bitwarden
+        name: psafe3-2-bitwarden-${{ matrix.platform }}
         path: psafe3-2-bitwarden*
