@@ -27,10 +27,10 @@ func main() {
 	}
 
 	var password string
+	password = "test123"
 	if len(bytePassword) != 0 {
 		password = string(bytePassword)
 	}
-	password = "test123"
 
 	vault, err := VaultFromFile(file, password)
 	if err != nil {
