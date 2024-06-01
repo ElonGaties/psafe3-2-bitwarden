@@ -3,20 +3,34 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"syscall"
+
+	"golang.org/x/term"
 )
 
 func main() {
 	var file string
-	var password string
 	var outfile string
 
 	flag.StringVar(&file, "f", "example.psafe3", "Filepath for psafe3 file")
-	flag.StringVar(&password, "p", "test123", "Password for psafe3 file")
 	flag.StringVar(&outfile, "o", "bitwarden.json", "Output filepath for bitwarden file")
 
 	flag.Parse()
+
+	fmt.Print("Password (test123): ")
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		panic(err)
+	}
+
+	var password string
+	if len(bytePassword) != 0 {
+		password = string(bytePassword)
+	}
+	password = "test123"
 
 	vault, err := VaultFromFile(file, password)
 	if err != nil {
